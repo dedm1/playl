@@ -59,7 +59,7 @@ void Widget::on_pushButton_clicked()
 {
      fileName1 = QFileDialog::getExistingDirectory(this, tr("откуда"), "");
 
-     //ui->label->setText(fileName1);
+     ui->label->setText(fileName1.dirName());
 }
 
 
@@ -67,7 +67,7 @@ void Widget::on_pushButton_2_clicked()
 {
     fileName2 = QFileDialog::getExistingDirectory(this, tr("куда"), "");
    // QString x=fileName2;
-   // ui->label_2->(fileName2);
+   ui->label_2->setText(fileName2.dirName());
 }
 
 void perzapis(QFileInfoList list )
@@ -78,9 +78,13 @@ void Widget::on_pushButton_3_clicked()
 {
     int  file1;
     QString x= ui->lineEdit->text();
-      file1 = x.toInt();
+    bool ok = false;
+      file1 = x.toInt(&ok, 10);
+      if (!ok) {
+          ui->label_3->setText("Couldn't get a number from input!!!\n");
+          return;
+      }
      //консольное приложение
-          QDir fileName1;  //объявляем объект работы с папками
           QStringList nameFilter;
           nameFilter << "*.h" << "*.o";
           fileName1.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);   ///устанавливаем фильтр выводимых файлов/папок (см ниже)
@@ -103,5 +107,19 @@ std::cout << std::endl;
                       list[j] = list[i];
                       list[i] = tmp;
                   }
-    //ui->label->setText(list);
+                  QString files_list;
+                  if (file1 > list.size()) {
+                      file1 = list.size();
+                  }
+                  for (int i = 0; i < file1; i++) {
+                      files_list += list[i].absoluteFilePath() + "\n";
+                  }
+    ui->label_3->setText(files_list);
+    for (int i = 0; i < file1; i++) {
+        if (!QFile::copy(list[i].absoluteFilePath(), fileName2.absolutePath() + '/' + list[i].fileName())) {
+            std::cerr << "Couldn't copy file!!!\n";
+            ui->label_3->setText("Couldn't copy file!!!\n");
+            break;
+        }
+    }
 }
