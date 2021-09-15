@@ -72,7 +72,7 @@ void Widget::on_pushButton_3_clicked()
       }
      //консольное приложение
           QStringList nameFilter;
-          nameFilter << "*.h" << "*.o";
+          nameFilter << "*.mp3" ;
           fileName1.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);   ///устанавливаем фильтр выводимых файлов/папок (см ниже)
           fileName1.setSorting(QDir::Size | QDir::Reversed);   //устанавливаем сортировку "от меньшего к большему"
           QFileInfoList list = fileName1.entryInfoList(nameFilter,QDir::Files); //получаем список файлов директории
