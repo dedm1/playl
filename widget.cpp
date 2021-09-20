@@ -63,6 +63,7 @@ void Widget::on_pushButton_2_clicked()
 
 void Widget::on_pushButton_3_clicked()
 {
+    ui->label_5->setText("");
     int  file1=0;
     QString x= ui->lineEdit->text();
     bool ok = false;
@@ -115,7 +116,6 @@ std::cout << std::endl;
     //ui->label_3->setText(files_list);
       ui->progressBar->setVisible(true);
       ui->label_3->setText("копирование началось \n");
-      //ui->progressBar->setValue(15);
     if (flag==false){
         for (int i = 0; i < file1; i++) {
             ui->progressBar->setValue( ((double) i/ (double) file1)*100 );
@@ -125,7 +125,7 @@ std::cout << std::endl;
             ok1=false;
             break;
         }
-            numder=i;
+            numder=i+1;
         }
     }
     if (flag==true)
@@ -139,11 +139,12 @@ std::cout << std::endl;
                 ui->label_3->setText("Не удалось скопировать файл!!!\n");
                 break;
             }
-            numder=i;
+            numder=i+1;
         }
     }
-    if (ok1){    ui->progressBar->setValue(100);
-    ui->label_3->setText("копирование завершено, файлов скопиравнно: \n");
+    if (ok1){
+    ui->progressBar->setValue(100);
+    ui->label_3->setText("копирование завершено, файлов скопировано: \n");
     ui->label_5->setText( QString::number(numder));
     }
 }
