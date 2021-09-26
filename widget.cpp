@@ -1,6 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <QDoubleValidator>
+#include <QStorageInfo>
 #include <QFileDialog>
 #include <QFile>
 #include <QDir>
@@ -9,7 +10,6 @@
 #include <QDebug>
 #include <string>
 #include <sys/types.h>
-#include <dirent.h>
 #include <errno.h>
 #include <vector>
 #include <string>
@@ -32,6 +32,9 @@ QDir fileName2;
 bool flag = false;
 bool flag1= false;
 bool flag2 = false;
+bool rand1 = false;
+bool full = false;
+
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -45,6 +48,24 @@ Widget::~Widget()
 {
     delete ui;
 }
+
+
+long printRootDriveInfo(QDir(filed)) {
+  // QStorageInfo storage = QStorageInfo::root();
+QStorageInfo storage(filed);
+   qDebug() << storage.rootPath();
+   if (storage.isReadOnly())
+       qDebug() << "isReadOnly:" << storage.isReadOnly();
+
+   qDebug() << "name:" << storage.name();
+   qDebug() << "filesystem type:" << storage.fileSystemType();
+   qDebug() << "size:" << storage.bytesTotal()/1024/1024 << "MB";
+   qDebug() << "free space:" << storage.bytesAvailable()/1024/1024 << "MB";
+return storage.bytesAvailable();
+}
+
+
+
 
 void Widget::on_pushButton_clicked()
 {
@@ -64,11 +85,12 @@ void Widget::on_pushButton_2_clicked()
 void Widget::on_pushButton_3_clicked()
 {
     ui->label_5->setText("");
+    long size1 = printRootDriveInfo(fileName2);
     int  file1=0;
     QString x= ui->lineEdit->text();
     bool ok = false;
     bool ok1 = true;
-    int numder=0;
+    int numder1=0;
       file1 = x.toInt(&ok, 10);
           QStringList nameFilter;
           nameFilter << "*.mp3" ;
@@ -82,10 +104,11 @@ void Widget::on_pushButton_3_clicked()
             ui->label_3->setText("нажмите на кнопку скопировать в\n");
             return;
           }
-          if (!ok) {
+          if (!ok and !full) {
               ui->label_3->setText("введите число для копирования\n");
               return;
           }
+          long siz =0;
           fileName1.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);   ///устанавливаем фильтр выводимых файлов/папок (см ниже)
           fileName1.setSorting(QDir::Size | QDir::Reversed);   //устанавливаем сортировку "от меньшего к большему"
           QFileInfoList list = fileName1.entryInfoList(nameFilter,QDir::Files); //получаем список файлов директории
@@ -93,10 +116,12 @@ void Widget::on_pushButton_3_clicked()
           /* в цикле выводим сведения о файлах */
           for (int i = 0; i < list.size(); ++i) {
               QFileInfo fileInfo = list.at(i);
-              std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //выводим в формате "размер имя"
-              std::cout << std::endl;  //переводим строку
+            //  std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //выводим в формате "размер имя"
+            //  std::cout << std::endl;  //переводим строку
           }
 std::cout << std::endl;
+
+                if (!rand1){
                   for (int i = list.size() - 1; i >= 1; i--)
                   {
                       srand ( time(NULL) );
@@ -105,15 +130,60 @@ std::cout << std::endl;
                      QFileInfo  tmp = list[j];
                       list[j] = list[i];
                       list[i] = tmp;
-                  }
+                  }}
+
                   QString files_list;
                   if (file1 > list.size()) {
                       file1 = list.size();
                   }
+/*
                   for (int i = 0; i < file1; i++) {
+                      QFileInfo fileInfo = list.at(i);
+                      siz = siz + fileInfo.size();
                       files_list += list[i].absoluteFilePath() + "\n";
                   }
-    //ui->label_3->setText(files_list);
+*/
+                  if (full){
+                   int  i=0;
+                   long sizz=0;
+                   bool flags=false;
+                   siz=0;
+                    while(siz<size1 && i<list.size())
+                    {
+                       QFileInfo fileInfo = list.at(i);
+                        siz = siz + fileInfo.size();
+                      i=i+1;
+                      std::cout <<fileInfo.size() <<std::endl;
+                      std::cout <<siz <<std::endl;
+                      std::cout <<size1 <<std::endl;
+                      std::cout <<list.size() <<std::endl;
+                      std::cout << i;
+                       std::cout << std::endl;
+                      if (i == list.size())
+                      {
+                         sizz=siz;
+                        siz=size1*2;
+                        flags=true;
+                      }
+
+                    }
+                    QFileInfo fileInfo = list.at(i);
+                     siz = siz - fileInfo.size();
+                     i=i-1;
+                    file1=i;
+                    if (flags){
+                siz=sizz;
+                    }
+                  }
+                  if (file1 > list.size()) {
+                      file1 = list.size();
+                  }
+                 if (siz>size1)
+           {
+              ui->label_3->setText("размер плейлиста больше свободного места");
+
+           }
+     else {
       ui->progressBar->setVisible(true);
       ui->label_3->setText("копирование началось \n");
     if (flag==false){
@@ -125,7 +195,7 @@ std::cout << std::endl;
             ok1=false;
             break;
         }
-            numder=i+1;
+            numder1=i+1;
         }
     }
     if (flag==true)
@@ -139,14 +209,14 @@ std::cout << std::endl;
                 ui->label_3->setText("Не удалось скопировать файл!!!\n");
                 break;
             }
-            numder=i+1;
+            numder1=i+1;
         }
     }
     if (ok1){
     ui->progressBar->setValue(100);
     ui->label_3->setText("копирование завершено, файлов скопировано: \n");
-    ui->label_5->setText( QString::number(numder));
-    }
+    ui->label_5->setText( QString::number(numder1));
+    }}
 }
 
 
@@ -161,5 +231,32 @@ void Widget::on_checkBox_clicked(bool checked)
     if (checked==true)
     {
         flag = true;
+    }
+}
+
+
+
+
+void Widget::on_checkBox_2_clicked(bool checked)
+{
+    if (checked==false)
+    {
+        rand1 = false;
+    }
+    if (checked==true)
+    {
+        rand1 = true;
+    }
+}
+
+void Widget::on_checkBox_3_clicked(bool checked)
+{
+    if (checked==false)
+    {
+        full = false;
+    }
+    if (checked==true)
+    {
+        full = true;
     }
 }
