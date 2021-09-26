@@ -132,24 +132,26 @@ std::cout << std::endl;
                       list[i] = tmp;
                   }}
 
+
                   QString files_list;
                   if (file1 > list.size()) {
                       file1 = list.size();
                   }
-/*
+
                   for (int i = 0; i < file1; i++) {
                       QFileInfo fileInfo = list.at(i);
                       siz = siz + fileInfo.size();
                       files_list += list[i].absoluteFilePath() + "\n";
                   }
-*/
+
                   if (full){
                    int  i=0;
                    long sizz=0;
                    bool flags=false;
                    siz=0;
-                    while(siz<size1 && i<list.size())
+                    while((siz<size1))
                     {
+                        if(siz<size1){
                        QFileInfo fileInfo = list.at(i);
                         siz = siz + fileInfo.size();
                       i=i+1;
@@ -159,21 +161,23 @@ std::cout << std::endl;
                       std::cout <<list.size() <<std::endl;
                       std::cout << i;
                        std::cout << std::endl;
+
                       if (i == list.size())
                       {
                          sizz=siz;
                         siz=size1*2;
                         flags=true;
+                        std::cout <<siz <<std::endl;
                       }
 
-                    }
-                    QFileInfo fileInfo = list.at(i);
-                     siz = siz - fileInfo.size();
-                     i=i-1;
-                    file1=i;
+                    }}
                     if (flags){
                 siz=sizz;
                     }
+                    i=i-1;
+                    QFileInfo fileInfo = list.at(i);
+                     siz = siz - fileInfo.size();
+                    file1=i;
                   }
                   if (file1 > list.size()) {
                       file1 = list.size();
