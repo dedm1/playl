@@ -137,6 +137,10 @@ std::cout << std::endl;
                   if (file1 > list.size()) {
                       file1 = list.size();
                   }
+                  if (file1 == 0) {
+                      ui->label_3->setText("Нет файлов для копирования.\n");
+                      return;
+                  }
 
                   for (int i = 0; i < file1; i++) {
                       QFileInfo fileInfo = list.at(i);
