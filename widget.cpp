@@ -39,9 +39,15 @@ bool full = false;
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
+
 {
     ui->setupUi(this);
+    this->setWindowTitle("Генератор плейлиста");
+
+    QDoubleValidator *validator = new  QDoubleValidator(this);
     ui->progressBar->setVisible(false);
+    ui->lineEdit->setValidator(validator);
+    setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 }
 
 Widget::~Widget()
@@ -88,6 +94,11 @@ void Widget::on_pushButton_3_clicked()
     unsigned long long size1 = printRootDriveInfo(fileName2);
     int  file1=0;
     QString x= ui->lineEdit->text();
+    if (x==".")
+    {
+        ui->label_3->setText("введите число для копирования\n");
+        return;
+    }
     bool ok = false;
     bool ok1 = true;
     int numder1=0;
@@ -116,9 +127,39 @@ void Widget::on_pushButton_3_clicked()
           /* в цикле выводим сведения о файлах */
           for (int i = 0; i < list.size(); ++i) {
               QFileInfo fileInfo = list.at(i);
-            //  std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //выводим в формате "размер имя"
+             // std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));   //выводим в формате "размер имя"
             //  std::cout << std::endl;  //переводим строку
           }
+
+
+          fileName2.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);   ///устанавливаем фильтр выводимых файлов/папок (см ниже)
+          fileName2.setSorting(QDir::Size | QDir::Reversed);   //устанавливаем сортировку "от меньшего к большему"
+          QFileInfoList list1 = fileName2.entryInfoList(nameFilter,QDir::Files);
+          if(list1.size()>0)
+          {
+              if(list1.size()<list.size()){
+          for (int i = 0; i < list1.size(); ++i) {
+                QFileInfo fileInfo = list.at(i);
+                  QFileInfo fileInfo1 = list1.at(i);
+               if (fileInfo.fileName()==fileInfo1.fileName())
+              {
+                      ui->label_3->setText("Выявлен дубликат, копирование приостановлено\n");
+                      return;
+                  }}}
+          else {
+                  for (int i = 0; i < list.size(); ++i) {
+                QFileInfo fileInfo = list.at(i);
+                  QFileInfo fileInfo1 = list1.at(i);
+                      if (list.at(i)==list1.at(i))
+                      {
+                              ui->label_3->setText("Выявлен дубликат, копирование приостановлено\n");
+                              return;
+                          }
+          }
+          }
+          }
+
+
 std::cout << std::endl;
 
                 if (!rand1){
@@ -197,11 +238,19 @@ std::cout << std::endl;
      else {
       ui->progressBar->setVisible(true);
       ui->label_3->setText("копирование началось \n");
+      int j=0;
     if (flag==false){
         for (int i = 0; i < file1; i++) {
             ui->progressBar->setValue( ((double) i/ (double) file1)*100 );
+
         if (!QFile::copy(list[i].absoluteFilePath(), fileName2.absolutePath() + '/' + list[i].fileName())) {
             std::cerr << "Couldn't copy file!!!\n";
+            if (i>0 && i<list.size())
+            {
+                ui->label_3->setText("Выявлен дубликат,скопированных файлов:\n");
+               ui->label_5->setText( QString::number(numder1));
+                return;
+            }
             ui->label_3->setText("Не удалось скопировать файл!!!\n");
             ok1=false;
             break;
@@ -211,11 +260,17 @@ std::cout << std::endl;
     }
     if (flag==true)
     {
-        for (int i = 0; i < file1; i++) {
+        for (int i = 0; i < file1; i++)
+        {
             ui->progressBar->setValue( ((double) i/ (double) file1)*100 );
             QString name1=QString::number(i+1);
-            if (!QFile::copy(list[i].absoluteFilePath(), fileName2.absolutePath() + '/' +name1+ list[i].fileName())) {
+            if (!QFile::copy(list[i].absoluteFilePath(), fileName2.absolutePath() + '/' +name1+" ."+ list[i].fileName())) {
                 std::cerr << "Couldn't copy file!!!\n";
+                if (i>0 && i<list.size())
+                {
+                    ui->label_3->setText("Выявлен дубликат, копирование приостановлено\n");
+                    return;
+                }
                 ok1=false;
                 ui->label_3->setText("Не удалось скопировать файл!!!\n");
                 break;
@@ -265,9 +320,11 @@ void Widget::on_checkBox_3_clicked(bool checked)
     if (checked==false)
     {
         full = false;
+        ui->lineEdit->setEnabled(true);
     }
     if (checked==true)
     {
         full = true;
+        ui->lineEdit->setEnabled(false);
     }
 }
