@@ -187,43 +187,9 @@ std::cout << std::endl;
                   }
 
                   if (full){
-                   int  i=0;
-                   unsigned long long sizz=0;
-                   bool flags=false;
-                   siz=0;
-                    while((siz<size1))
-                    {
-                        if(siz<size1){
-                       QFileInfo fileInfo = list.at(i);
-                        siz = siz + fileInfo.size();
-                      std::cout <<fileInfo.size() <<std::endl;
-                      std::cout <<siz <<std::endl;
-                      std::cout <<size1 <<std::endl;
-                      std::cout <<list.size() <<std::endl;
-                      std::cout << i;
-                       std::cout << std::endl;
-                        i=i+1;
-                      if (i == list.size())
-                      {
-                         sizz=siz;
-                        siz=size1+10;
-                        flags=true;
-                        std::cout <<siz <<std::endl;
-                      }
-
-                    }}
-                    if (flags){
-                siz=sizz;
-                    }
-                    i=i-1;
-                    QFileInfo fileInfo = list.at(i);
-                     siz = siz - fileInfo.size();
-                    file1=i;
-
+                  file1 = list.size();
                   }
-                  if (file1 > list.size()) {
-                      file1 = list.size();
-                  }
+
                   std::cout <<siz <<std::endl;
                   std::cout <<size1 <<std::endl;
                  if (siz>size1)
