@@ -211,6 +211,13 @@ std::cout << std::endl;
 
         if (!QFile::copy(list[i].absoluteFilePath(), fileName2.absolutePath() + '/' + list[i].fileName())) {
             std::cerr << "Couldn't copy file!!!\n";
+            if (i>0 && i<list.size() && full )
+            {
+                ui->label_3->setText("Память закончилась, скопированных файлов\n");
+                ui->label_5->setText( QString::number(numder1));
+                ui->progressBar->setValue(100);
+                return;
+            }
             if (i>0 && i<list.size())
             {
                 ui->label_3->setText("Выявлен дубликат,скопированных файлов:\n");
@@ -232,9 +239,17 @@ std::cout << std::endl;
             QString name1=QString::number(i+1);
             if (!QFile::copy(list[i].absoluteFilePath(), fileName2.absolutePath() + '/' +name1+" ."+ list[i].fileName())) {
                 std::cerr << "Couldn't copy file!!!\n";
+                if (i>0 && i<list.size() && full )
+                {
+                    ui->label_3->setText("Память закончилась, скопированных файлов\n");
+                    ui->label_5->setText( QString::number(numder1));
+                    ui->progressBar->setValue(100);
+                    return;
+                }
                 if (i>0 && i<list.size())
                 {
                     ui->label_3->setText("Выявлен дубликат, копирование приостановлено\n");
+                    ui->label_5->setText( QString::number(numder1));
                     return;
                 }
                 ok1=false;
